@@ -1,13 +1,16 @@
-using MatchMaking.Service;
 using MatchMaking.Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Register custom services
 builder.Services.AddSingleton<IMatchService, MatchService>();
+
+// Add background service for consuming match completions
 builder.Services.AddHostedService<MatchCompletionConsumerService>();
 
 var app = builder.Build();

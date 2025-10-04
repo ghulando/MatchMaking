@@ -5,8 +5,7 @@ namespace MatchMaking.Service.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class MatchController(IMatchService matchService, ILogger<MatchController> logger)
-    : ControllerBase
+public class MatchController(IMatchService matchService, ILogger<MatchController> logger): ControllerBase
 {
     [HttpPost("search")]
     public async Task<IActionResult> SearchMatch([FromQuery] string userId)

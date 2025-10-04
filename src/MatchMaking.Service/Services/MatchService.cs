@@ -15,7 +15,7 @@ public class MatchService : IMatchService, IDisposable
     public MatchService(IConfiguration configuration, ILogger<MatchService> logger)
     {
         _logger = logger;
-        _rateLimitWindowMs = configuration.GetValue<int>("RateLimit:WindowMs", 100);
+        _rateLimitWindowMs = configuration.GetValue("RateLimit:WindowMs", 100);
 
         // Initialize Kafka producer
         var kafkaConfig = new ProducerConfig
@@ -140,6 +140,6 @@ public class MatchService : IMatchService, IDisposable
 
     public void Dispose()
     {
-        _producer?.Dispose();
+        _producer.Dispose();
     }
 }

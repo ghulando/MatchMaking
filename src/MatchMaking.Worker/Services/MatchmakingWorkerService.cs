@@ -17,7 +17,7 @@ public class MatchmakingWorkerService : BackgroundService
     public MatchmakingWorkerService(IConfiguration configuration, ILogger<MatchmakingWorkerService> logger)
     {
         _logger = logger;
-        _playersPerMatch = configuration.GetValue<int>("MatchMaking:PlayersPerMatch", 3);
+        _playersPerMatch = configuration.GetValue("MatchMaking:PlayersPerMatch", 3);
 
         // Initialize Kafka consumer
         var consumerConfig = new ConsumerConfig
@@ -180,8 +180,8 @@ public class MatchmakingWorkerService : BackgroundService
 
     public override void Dispose()
     {
-        _consumer?.Dispose();
-        _producer?.Dispose();
+        _consumer.Dispose();
+        _producer.Dispose();
         base.Dispose();
     }
 }

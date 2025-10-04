@@ -1,9 +1,8 @@
 using System.Text.Json;
 using Confluent.Kafka;
 using MatchMaking.Service.Models;
-using MatchMaking.Service.Services;
 
-namespace MatchMaking.Service;
+namespace MatchMaking.Service.Services;
 
 public class MatchCompletionConsumerService : BackgroundService
 {
@@ -20,16 +19,42 @@ public class MatchCompletionConsumerService : BackgroundService
     {
       BootstrapServers = configuration["Kafka:BootstrapServers"],
       GroupId = configuration["Kafka:GroupId"],
-      AutoOffsetReset = AutoOffsetReset.Earliest
+      AutoOffsetReset = AutoOffsetReset.Earliest,
+      EnableAutoCommit = false,
+      SessionTimeoutMs = 30000,
+      HeartbeatIntervalMs = 10000
     };
 
     _consumer = new ConsumerBuilder<string, string>(consumerConfig).Build();
-    _consumer.Subscribe("matchmaking.complete");
   }
 
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
   {
-    _logger.LogInformation("MatchCompletionConsumerService started");
+    _logger.LogInformation("MatchCompletionConsumerService starting...");
+
+    // Wait for Kafka to be ready
+    await Task.Delay(15000, stoppingToken); // Wait 15 seconds
+    
+    try
+    {
+      _consumer.Subscribe("matchmaking.complete");
+      _logger.LogInformation("Subscribed to matchmaking.complete topic");
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, "Failed to subscribe to topic, will retry...");
+      await Task.Delay(5000, stoppingToken);
+      try
+      {
+        _consumer.Subscribe("matchmaking.complete");
+        _logger.LogInformation("Successfully subscribed to matchmaking.complete topic on retry");
+      }
+      catch (Exception retryEx)
+      {
+        _logger.LogError(retryEx, "Failed to subscribe to topic on retry");
+        return;
+      }
+    }
 
     try
     {
@@ -37,16 +62,28 @@ public class MatchCompletionConsumerService : BackgroundService
       {
         try
         {
-          var result = _consumer.Consume(TimeSpan.FromSeconds(1));
+          var result = _consumer.Consume(TimeSpan.FromSeconds(5));
                     
           if (result?.Message?.Value != null)
           {
             await ProcessMatchComplete(result.Message.Value);
+            _consumer.Commit(result);
           }
+        }
+        catch (ConsumeException ex) when (ex.Error.Code == ErrorCode.UnknownTopicOrPart)
+        {
+          _logger.LogWarning("Topic not available yet, waiting...");
+          await Task.Delay(5000, stoppingToken);
         }
         catch (ConsumeException ex)
         {
           _logger.LogError(ex, "Error consuming message from matchmaking.complete topic");
+          await Task.Delay(1000, stoppingToken);
+        }
+        catch (Exception ex)
+        {
+          _logger.LogError(ex, "Unexpected error in consumer");
+          await Task.Delay(1000, stoppingToken);
         }
       }
     }
@@ -56,7 +93,14 @@ public class MatchCompletionConsumerService : BackgroundService
     }
     finally
     {
-      _consumer.Close();
+      try
+      {
+        _consumer.Close();
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex, "Error closing consumer");
+      }
     }
   }
 

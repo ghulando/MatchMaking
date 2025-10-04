@@ -74,6 +74,12 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - Kafka__BootstrapServers=kafka:29092
       - Redis__ConnectionString=redis:6379
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/match/info/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   matchmaking-worker-1:
     build:
@@ -89,6 +95,7 @@ services:
       - Kafka__BootstrapServers=kafka:29092
       - Redis__ConnectionString=redis:6379
       - MatchMaking__PlayersPerMatch=3
+    restart: unless-stopped
 
   matchmaking-worker-2:
     build:
@@ -104,3 +111,4 @@ services:
       - Kafka__BootstrapServers=kafka:29092
       - Redis__ConnectionString=redis:6379
       - MatchMaking__PlayersPerMatch=3
+    restart: unless-stopped
