@@ -65,4 +65,10 @@ public class MatchController(IMatchService matchService, ILogger<MatchController
             return StatusCode(500, "Internal server error");
         }
     }
+
+    [HttpGet("health")]
+    public IActionResult Health()
+    {
+        return Ok(new { status = "healthy", timestamp = DateTime.UtcNow });
+    }
 }

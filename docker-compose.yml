@@ -76,10 +76,11 @@ services:
       - Redis__ConnectionString=redis:6379
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/match/info/healthcheck"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/match/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
 
   matchmaking-worker-1:
     build:
