@@ -1,38 +1,50 @@
 using Microsoft.AspNetCore.Mvc;
-using MatchMaking.Service.Services;
+using MatchMaking.Application.UseCases;
 
 namespace MatchMaking.Service.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class MatchController(IMatchService matchService, ILogger<MatchController> logger): ControllerBase
+public class MatchController : ControllerBase
 {
+    private readonly RequestMatchUseCase _requestMatchUseCase;
+    private readonly GetMatchInfoUseCase _getMatchInfoUseCase;
+    private readonly ILogger<MatchController> _logger;
+
+    public MatchController(
+        RequestMatchUseCase requestMatchUseCase,
+        GetMatchInfoUseCase getMatchInfoUseCase,
+        ILogger<MatchController> logger)
+    {
+        _requestMatchUseCase = requestMatchUseCase;
+        _getMatchInfoUseCase = getMatchInfoUseCase;
+        _logger = logger;
+    }
+
     [HttpPost("search")]
     public async Task<IActionResult> SearchMatch([FromQuery] string userId)
     {
         if (string.IsNullOrWhiteSpace(userId))
         {
-            logger.LogWarning("Match search request with invalid userId");
+            _logger.LogWarning("Match search request with invalid userId");
             return BadRequest("UserId is required");
         }
 
         try
         {
-            // Check rate limit
-            if (!await matchService.CanMakeRequestAsync(userId))
+            var result = await _requestMatchUseCase.ExecuteAsync(userId);
+            
+            if (!result)
             {
                 return BadRequest("Rate limit exceeded. Max 1 request per 100ms");
             }
-
-            // Send match request
-            await matchService.RequestMatchAsync(userId);
             
-            logger.LogInformation("Match search request accepted for user {UserId}", userId);
+            _logger.LogInformation("Match search request accepted for user {UserId}", userId);
             return NoContent();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error processing match search for user {UserId}", userId);
+            _logger.LogError(ex, "Error processing match search for user {UserId}", userId);
             return StatusCode(500, "Internal server error");
         }
     }
@@ -42,26 +54,26 @@ public class MatchController(IMatchService matchService, ILogger<MatchController
     {
         if (string.IsNullOrWhiteSpace(userId))
         {
-            logger.LogWarning("Match info request with invalid userId");
+            _logger.LogWarning("Match info request with invalid userId");
             return BadRequest("UserId is required");
         }
 
         try
         {
-            var matchInfo = await matchService.GetMatchInfoAsync(userId);
+            var matchInfo = await _getMatchInfoUseCase.ExecuteAsync(userId);
             
             if (matchInfo == null)
             {
-                logger.LogInformation("No match found for user {UserId}", userId);
+                _logger.LogInformation("No match found for user {UserId}", userId);
                 return NotFound("No match found for this user");
             }
 
-            logger.LogInformation("Match info retrieved for user {UserId}", userId);
+            _logger.LogInformation("Match info retrieved for user {UserId}", userId);
             return Ok(matchInfo);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error retrieving match info for user {UserId}", userId);
+            _logger.LogError(ex, "Error retrieving match info for user {UserId}", userId);
             return StatusCode(500, "Internal server error");
         }
     }

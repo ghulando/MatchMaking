@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Confluent.Kafka;
-using MatchMaking.Service.Models;
+using MatchMaking.Application.UseCases;
 
 namespace MatchMaking.Service.Services;
 
@@ -108,14 +108,14 @@ public class MatchCompletionConsumerService : BackgroundService
   {
     try
     {
-      var matchComplete = JsonSerializer.Deserialize<MatchComplete>(messageValue);
+      var matchComplete = JsonSerializer.Deserialize<MatchCompleteDto>(messageValue);
             
       if (matchComplete != null)
       {
         using var scope = _serviceProvider.CreateScope();
-        var matchService = scope.ServiceProvider.GetRequiredService<IMatchService>();
+        var storeMatchInfoUseCase = scope.ServiceProvider.GetRequiredService<StoreMatchInfoUseCase>();
                 
-        await matchService.StoreMatchInfoAsync(matchComplete.MatchId, matchComplete.UserIds);
+        await storeMatchInfoUseCase.ExecuteAsync(matchComplete.MatchId, matchComplete.UserIds);
                 
         _logger.LogInformation("Processed match completion for match {MatchId} with {UserCount} users", 
           matchComplete.MatchId, matchComplete.UserIds.Length);
@@ -132,4 +132,6 @@ public class MatchCompletionConsumerService : BackgroundService
     _consumer.Dispose();
     base.Dispose();
   }
+
+  private record MatchCompleteDto(string MatchId, string[] UserIds);
 }

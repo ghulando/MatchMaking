@@ -14,4 +14,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MatchMaking.Application\MatchMaking.Application.csproj" />
+    <ProjectReference Include="..\MatchMaking.Infrastructure\MatchMaking.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
