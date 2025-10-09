@@ -1,6 +1,6 @@
 # MatchMaking System
 
-A matchmaking system built with .NET 9, Kafka, and Redis for grouping players into matches.
+A matchmaking system built with .NET 9, Kafka, and Redis for grouping players into matches, following Clean Architecture principles.
 
 ## Overview
 
@@ -17,6 +17,16 @@ This solution implements the MatchMaking test task requirements:
 - **MatchMaking.Worker**: Background workers (2 instances) for match processing
 - **Communication**: Kafka topics (`matchmaking.request` and `matchmaking.complete`)
 - **Storage**: Redis for rate limiting and match data
+
+**Architecture:**
+
+This project follows **Clean Architecture** principles with clear separation of concerns:
+- **Domain Layer**: Core business entities and interfaces
+- **Application Layer**: Use cases and business logic
+- **Infrastructure Layer**: External integrations (Redis, Kafka)
+- **Presentation Layer**: API and Worker services
+
+For detailed architecture documentation, see [CLEAN_ARCHITECTURE.md](CLEAN_ARCHITECTURE.md)
 
 ## Infrastructure Setup
 
