@@ -3,15 +3,10 @@ using StackExchange.Redis;
 
 namespace MatchMaking.Infrastructure.Repositories;
 
-public class RedisPendingPlayersRepository : IPendingPlayersRepository
+public class RedisPendingPlayersRepository(IDatabase redis) : IPendingPlayersRepository
 {
-    private readonly IDatabase _redis;
+    private readonly IDatabase _redis = redis;
     private readonly string _pendingPlayersKey = "pending_players";
-
-    public RedisPendingPlayersRepository(IDatabase redis)
-    {
-        _redis = redis;
-    }
 
     public async Task<bool> AddPlayerAsync(string userId)
     {

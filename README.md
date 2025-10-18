@@ -21,6 +21,7 @@ This solution implements the MatchMaking test task requirements:
 **Architecture:**
 
 This project follows **Clean Architecture** principles with clear separation of concerns:
+
 - **Domain Layer**: Core business entities and interfaces
 - **Application Layer**: Use cases and business logic
 - **Infrastructure Layer**: External integrations (Redis, Kafka)

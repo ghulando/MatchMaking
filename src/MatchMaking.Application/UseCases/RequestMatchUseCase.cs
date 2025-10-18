@@ -2,21 +2,14 @@ using MatchMaking.Domain.Repositories;
 
 namespace MatchMaking.Application.UseCases;
 
-public class RequestMatchUseCase
+public class RequestMatchUseCase(
+    IRateLimitRepository rateLimitRepository,
+    IMessagePublisher messagePublisher,
+    int rateLimitWindowMs = 100)
 {
-    private readonly IRateLimitRepository _rateLimitRepository;
-    private readonly IMessagePublisher _messagePublisher;
-    private readonly int _rateLimitWindowMs;
-
-    public RequestMatchUseCase(
-        IRateLimitRepository rateLimitRepository, 
-        IMessagePublisher messagePublisher,
-        int rateLimitWindowMs = 100)
-    {
-        _rateLimitRepository = rateLimitRepository;
-        _messagePublisher = messagePublisher;
-        _rateLimitWindowMs = rateLimitWindowMs;
-    }
+    private readonly IRateLimitRepository _rateLimitRepository = rateLimitRepository;
+    private readonly IMessagePublisher _messagePublisher = messagePublisher;
+    private readonly int _rateLimitWindowMs = rateLimitWindowMs;
 
     public async Task<bool> ExecuteAsync(string userId)
     {

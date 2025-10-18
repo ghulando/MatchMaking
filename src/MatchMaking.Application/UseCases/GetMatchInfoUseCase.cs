@@ -3,14 +3,9 @@ using MatchMaking.Domain.Repositories;
 
 namespace MatchMaking.Application.UseCases;
 
-public class GetMatchInfoUseCase
+public class GetMatchInfoUseCase(IMatchRepository matchRepository)
 {
-    private readonly IMatchRepository _matchRepository;
-
-    public GetMatchInfoUseCase(IMatchRepository matchRepository)
-    {
-        _matchRepository = matchRepository;
-    }
+    private readonly IMatchRepository _matchRepository = matchRepository;
 
     public async Task<MatchInfoDto?> ExecuteAsync(string userId)
     {

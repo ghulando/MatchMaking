@@ -5,10 +5,12 @@ This project now follows Clean Architecture principles with clear separation of 
 ## Architecture Layers
 
 ### 1. Domain Layer (`MatchMaking.Domain`)
+
 The core layer containing business entities and repository interfaces. This layer has no dependencies on other layers.
 
 **Key Components:**
 - **Entities**: `Match`, `MatchRequest` - Domain models with business rules
+
 - **Repository Interfaces**: 
   - `IMatchRepository` - Match data access
   - `IRateLimitRepository` - Rate limiting logic
@@ -16,10 +18,13 @@ The core layer containing business entities and repository interfaces. This laye
   - `IMessagePublisher` - Message broker abstraction
 
 ### 2. Application Layer (`MatchMaking.Application`)
+
 Contains business logic and use cases. Depends only on the Domain layer.
 
 **Key Components:**
+
 - **Use Cases**:
+
   - `RequestMatchUseCase` - Handle match search requests
   - `GetMatchInfoUseCase` - Retrieve match information
   - `StoreMatchInfoUseCase` - Store match results
@@ -28,10 +33,13 @@ Contains business logic and use cases. Depends only on the Domain layer.
 - **DTOs**: `MatchInfoDto` - Data transfer objects
 
 ### 3. Infrastructure Layer (`MatchMaking.Infrastructure`)
+
 Implements repository interfaces using external technologies (Redis, Kafka). Depends on Domain layer.
 
 **Key Components:**
+
 - **Repositories**:
+
   - `RedisMatchRepository` - Redis-based match storage
   - `RedisRateLimitRepository` - Redis-based rate limiting
   - `RedisPendingPlayersRepository` - Redis-based player queue
@@ -39,14 +47,17 @@ Implements repository interfaces using external technologies (Redis, Kafka). Dep
   - `KafkaMessagePublisher` - Kafka-based message publishing
 
 ### 4. Presentation Layer (`MatchMaking.Service`, `MatchMaking.Worker`)
+
 API and worker implementations that consume the Application layer.
 
 **MatchMaking.Service:**
+
 - REST API controllers
 - Background consumer service
 - Dependency injection configuration
 
 **MatchMaking.Worker:**
+
 - Background worker for match processing
 - Kafka consumer implementation
 
@@ -60,7 +71,7 @@ API and worker implementations that consume the Application layer.
 
 ## Dependency Flow
 
-```
+``` bash
 Presentation → Application → Domain ← Infrastructure
 ```
 

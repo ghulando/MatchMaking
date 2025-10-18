@@ -5,14 +5,9 @@ using StackExchange.Redis;
 
 namespace MatchMaking.Infrastructure.Repositories;
 
-public class RedisMatchRepository : IMatchRepository
+public class RedisMatchRepository(IDatabase redis) : IMatchRepository
 {
-    private readonly IDatabase _redis;
-
-    public RedisMatchRepository(IDatabase redis)
-    {
-        _redis = redis;
-    }
+    private readonly IDatabase _redis = redis;
 
     public async Task<Match?> GetMatchByUserIdAsync(string userId)
     {

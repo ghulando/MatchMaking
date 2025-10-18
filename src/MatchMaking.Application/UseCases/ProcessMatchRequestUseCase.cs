@@ -3,18 +3,12 @@ using MatchMaking.Domain.Entities;
 
 namespace MatchMaking.Application.UseCases;
 
-public class ProcessMatchRequestUseCase
+public class ProcessMatchRequestUseCase(
+    IPendingPlayersRepository pendingPlayersRepository,
+    int playersPerMatch = 3)
 {
-    private readonly IPendingPlayersRepository _pendingPlayersRepository;
-    private readonly int _playersPerMatch;
-
-    public ProcessMatchRequestUseCase(
-        IPendingPlayersRepository pendingPlayersRepository,
-        int playersPerMatch = 3)
-    {
-        _pendingPlayersRepository = pendingPlayersRepository;
-        _playersPerMatch = playersPerMatch;
-    }
+    private readonly IPendingPlayersRepository _pendingPlayersRepository = pendingPlayersRepository;
+    private readonly int _playersPerMatch = playersPerMatch;
 
     public async Task<bool> ExecuteAsync(string userId)
     {

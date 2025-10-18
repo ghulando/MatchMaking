@@ -3,14 +3,9 @@ using StackExchange.Redis;
 
 namespace MatchMaking.Infrastructure.Repositories;
 
-public class RedisRateLimitRepository : IRateLimitRepository
+public class RedisRateLimitRepository(IDatabase redis) : IRateLimitRepository
 {
-    private readonly IDatabase _redis;
-
-    public RedisRateLimitRepository(IDatabase redis)
-    {
-        _redis = redis;
-    }
+    private readonly IDatabase _redis = redis;
 
     public async Task<bool> CanMakeRequestAsync(string userId, int windowMs)
     {
