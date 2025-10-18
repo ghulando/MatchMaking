@@ -59,8 +59,8 @@ services:
   # Application Services
   matchmaking-service:
     build:
-      context: ./src/MatchMaking.Service
-      dockerfile: Dockerfile
+      context: ./src
+      dockerfile: MatchMaking.Service/Dockerfile
     hostname: matchmaking-service
     container_name: matchmaking-service
     depends_on:
@@ -84,8 +84,8 @@ services:
 
   matchmaking-worker-1:
     build:
-      context: ./src/MatchMaking.Worker
-      dockerfile: Dockerfile
+      context: ./src
+      dockerfile: MatchMaking.Worker/Dockerfile
     hostname: matchmaking-worker-1
     container_name: matchmaking-worker-1
     depends_on:
@@ -100,8 +100,8 @@ services:
 
   matchmaking-worker-2:
     build:
-      context: ./src/MatchMaking.Worker
-      dockerfile: Dockerfile
+      context: ./src
+      dockerfile: MatchMaking.Worker/Dockerfile
     hostname: matchmaking-worker-2
     container_name: matchmaking-worker-2
     depends_on:

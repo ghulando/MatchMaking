@@ -3,10 +3,13 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["MatchMaking.Worker.csproj", "."]
-RUN dotnet restore "./MatchMaking.Worker.csproj"
+COPY ["MatchMaking.Worker/MatchMaking.Worker.csproj", "MatchMaking.Worker/"]
+COPY ["MatchMaking.Application/MatchMaking.Application.csproj", "MatchMaking.Application/"]
+COPY ["MatchMaking.Domain/MatchMaking.Domain.csproj", "MatchMaking.Domain/"]
+COPY ["MatchMaking.Infrastructure/MatchMaking.Infrastructure.csproj", "MatchMaking.Infrastructure/"]
+RUN dotnet restore "MatchMaking.Worker/MatchMaking.Worker.csproj"
 COPY . .
-WORKDIR "/src/."
+WORKDIR "/src/MatchMaking.Worker"
 RUN dotnet build "MatchMaking.Worker.csproj" -c Release -o /app/build
 
 FROM build AS publish
